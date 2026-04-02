@@ -40,3 +40,20 @@ minio_data/
 
 # Expo / React Native
 .expo/
+
+# SQLite local dev databases
+*.db
+*.sqlite
+
+# Uploaded files (stored locally during dev; use MinIO/S3 in production)
+apps/api/uploads/
+
+# Test files
+test_design.pdf
+
+# EAS / app store secrets (never commit these)
+AgriPermitMobile/secrets/
+
+# SSL certs (managed by certbot on the server)
+deploy/certbot/
+deploy/ssl/

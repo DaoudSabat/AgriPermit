@@ -1,6 +1,15 @@
 @echo off
 echo Starting AgriPermit API...
 cd apps\api
+
+REM Load .env if it exists (sets env vars for this session)
+if exist .env (
+    for /f "usebackq tokens=1,* delims==" %%A in (`findstr /v "^#" .env ^| findstr /v "^$"`) do (
+        set "%%A=%%B"
+    )
+    echo Loaded .env
+)
+
 start "AgriPermit API" python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 cd ..\..
 echo.

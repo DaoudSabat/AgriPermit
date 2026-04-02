@@ -1,0 +1,172 @@
+{
+  "app": {
+    "title": "AgriPermit",
+    "subtitle": "نظام تصاريح الأراضي الزراعية",
+    "loading": "جارٍ التحميل...",
+    "signOut": "تسجيل الخروج"
+  },
+  "login": {
+    "username":   "اسم المستخدم",
+    "usernamePh": "أدخل اسم المستخدم",
+    "password":   "كلمة المرور",
+    "submit":     "تسجيل الدخول",
+    "loggingIn":  "جارٍ تسجيل الدخول...",
+    "hint":       "تواصل مع المسؤول لإنشاء حساب"
+  },
+  "stats": {
+    "total":    "الإجمالي",
+    "pending":  "قيد الانتظار",
+    "approved": "مقبول",
+    "rejected": "مرفوض",
+    "blocked":  "محظور GIS"
+  },
+  "tabs": {
+    "list":  "قائمة الطلبات",
+    "new":   "تقديم طلب جديد",
+    "check": "فحص القطعة"
+  },
+  "permits": {
+    "title": "طلبات التصاريح",
+    "empty": "لم يتم العثور على طلبات.",
+    "columns": {
+      "number":    "رقم التصريح",
+      "parcel":    "القطعة",
+      "applicant": "مقدم الطلب",
+      "type":      "النوع",
+      "status":    "الحالة",
+      "gis":       "فحص GIS",
+      "date":      "تاريخ التقديم",
+      "actions":   "إجراءات"
+    },
+    "status": {
+      "pending":  "قيد الانتظار",
+      "approved": "مقبول",
+      "rejected": "مرفوض"
+    },
+    "type": {
+      "agricultural": "زراعي",
+      "construction": "إنشاء",
+      "water":        "مياه",
+      "other":        "أخرى"
+    },
+    "filter": {
+      "statusLabel":  "الحالة:",
+      "gisLabel":     ":GIS",
+      "all":          "الكل",
+      "flagged":      "مع مخالفات",
+      "ok":           "سليم",
+      "refresh":      "تحديث",
+      "refreshing":   "جارٍ التحميل..."
+    },
+    "pagination": {
+      "prev": "السابق ›",
+      "next": "‹ التالي",
+      "info": "الصفحة {{current}} من {{total}} ({{count}} إجمالي)"
+    }
+  },
+  "action": {
+    "handle":          "▼ إجراء",
+    "close":           "▲ إغلاق",
+    "none":            "—",
+    "choose":          "اختر إجراءً للطلب {{number}}:",
+    "chooseBlocked":   "طلب محظور بواسطة GIS — اختر إجراءً:",
+    "approve":         "موافقة",
+    "reject":          "رفض",
+    "cancel":          "إلغاء",
+    "back":            "رجوع",
+    "confirmApprove":  "تأكيد الموافقة",
+    "confirmReject":   "تأكيد الرفض",
+    "approvedByLabel": "اسم المعتمِد *",
+    "approvedByPh":    "الاسم الكامل",
+    "reasonLabel":     "سبب الرفض *",
+    "reasonPh":        "حدد السبب",
+    "submitting":      "جارٍ الإرسال...",
+    "errApprovedBy":   "مطلوب اسم المعتمِد",
+    "errReason":       "سبب الرفض مطلوب"
+  },
+  "gis": {
+    "ok":            "✓ سليم",
+    "warn":          "⚠ تحذير",
+    "block":         "⛔ محظور",
+    "okTitle":       "اجتاز فحص GIS بدون ملاحظات",
+    "warnTitle":     "تحذير — مطلوب مراجعة يدوية",
+    "blockTitle":    "محظور — الطلب ينتهك قاعدة GIS صارمة",
+    "headingBlock":  "⛔ نتائج GIS — حظر ومخالفات",
+    "headingWarn":   "⚠ نتائج GIS — ملاحظات للمراجعة",
+    "severityBlock": "حظر",
+    "severityWarn":  "تحذير"
+  },
+  "check": {
+    "title":           "فحص فوري للقطعة",
+    "subtitle":        "أدخل رقم الحوض والقطعة لمعرفة ما هو مسموح به على هذه الأرض",
+    "modeKnown":       "قطعة معروفة",
+    "modeManual":      "رقم الحوض والقطعة",
+    "parcelLabel":     "القطعة",
+    "parcelPh":        "اختر قطعة",
+    "gushLabel":       "الحوض (גוש)",
+    "gushPh":          "مثال: 30001",
+    "helkaLabel":      "القطعة (חלקה)",
+    "helkaPh":         "مثال: 12",
+    "zoneLabel":       "المنطقة (اختياري)",
+    "zonePh":          "مثال: חקלאי",
+    "submit":          "فحص القطعة",
+    "checking":        "جارٍ الفحص...",
+    "errGushHelka":    "يرجى إدخال رقم الحوض والقطعة",
+    "resultsTitle":    "نتائج التخطيط",
+    "plan":            "مخطط البناء",
+    "maxFloors":       "الحد الأقصى للطوابق",
+    "maxCoverage":     "نسبة البناء القصوى",
+    "permittedUses":   "الاستخدامات المسموحة",
+    "protectedZone":   "منطقة محمية",
+    "agFreeze":        "تجميد زراعي",
+    "yes":             "نعم",
+    "no":              "لا",
+    "source":          "مصدر البيانات",
+    "floors_unit":     "طوابق",
+    "permitTypes":     "أهلية نوع التصريح",
+    "allowed":         "مسموح",
+    "blocked":         "محظور"
+  },
+  "org": {
+    "createTitle": "إنشاء منظمة",
+    "orgName": "اسم المنظمة",
+    "orgNamePh": "مثال: بلدية القدس",
+    "orgSlug": "رابط URL",
+    "adminUsername": "اسم مستخدم المسؤول",
+    "adminEmail": "بريد المسؤول الإلكتروني",
+    "adminName": "الاسم الكامل",
+    "password": "كلمة المرور",
+    "submit": "إنشاء وتسجيل الدخول",
+    "submitting": "جارٍ الإنشاء...",
+    "switchToLogin": "لديك حساب بالفعل؟ سجّل الدخول",
+    "switchToCreate": "منظمة جديدة؟ أنشئ واحدة",
+    "slugHint": "يُستخدم في روابط URL. أحرف وأرقام وشرطات فقط."
+  },
+  "form": {
+    "title":           "تقديم طلب تصريح جديد",
+    "parcelLabel":     "القطعة *",
+    "parcelLoading":   "جارٍ تحميل القطع...",
+    "parcelPh":        "اختر قطعة",
+    "typeLabel":       "نوع التصريح *",
+    "nameLabel":       "اسم مقدم الطلب *",
+    "namePh":          "الاسم الكامل",
+    "emailLabel":      "البريد الإلكتروني *",
+    "emailPh":         "name@example.com",
+    "floorsLabel":     "عدد الطوابق المطلوبة",
+    "floorsPh":        "مثال: 4",
+    "floorsHint":      "يتم فحصه مقابل مخطط البناء للقطعة",
+    "coverageLabel":   "نسبة البناء المطلوبة (%)",
+    "coveragePh":      "مثال: 18",
+    "coverageHint":    "يتم فحصه مقابل الحد الأقصى المسموح به",
+    "descLabel":       "وصف الطلب",
+    "descPh":          "تفاصيل إضافية (اختياري)",
+    "submit":          "تقديم الطلب",
+    "submitting":      "جارٍ الإرسال...",
+    "clear":           "مسح النموذج",
+    "success":         "!تم تقديم الطلب {{number}} بنجاح",
+    "errParcel":       "يرجى اختيار قطعة",
+    "errName":         "حقل مطلوب",
+    "errEmail":        "حقل مطلوب",
+    "errEmailInvalid": "عنوان البريد الإلكتروني غير صالح"
+  }
+}

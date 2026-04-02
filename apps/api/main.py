@@ -1,136 +1,80 @@
-# Simple FastAPI without complex dependencies
-# Save this as: C:\Projects\AgriPermit\apps\api\main.py
+import sys
+from contextlib import asynccontextmanager
+from pathlib import Path
 
-from http.server import HTTPServer, BaseHTTPRequestHandler
-import json
+# Load .env from apps/api/ before anything else reads os.getenv()
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).parent / ".env")
 
-class SimpleAPIHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == '/':
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            response = {
-                "message": "AgriPermit API",
-                "status": "running",
-                "version": "1.0.0"
-            }
-            self.wfile.write(json.dumps(response).encode())
-        
-        elif self.path == '/health':
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            response = {"status": "healthy"}
-            self.wfile.write(json.dumps(response).encode())
-        
-        elif self.path == '/api/v1/parcels':
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            response = {
-                "parcels": [
-                    {
-                        "id": "jer_1001",
-                        "address": "רחוב הרצל 1, ירושלים",
-                        "zone": "חקלאי",
-                        "area_sqm": 1000
-                    },
-                    {
-                        "id": "jer_1002",
-                        "address": "שכונת עיר גנים, ירושלים",
-                        "zone": "חקלאי פרטי",
-                        "area_sqm": 1500
-                    }
-                ]
-            }
-            self.wfile.write(json.dumps(response).encode())
-        
-        elif self.path == '/docs':
-            self.send_response(200)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
-            html = """
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>AgriPermit API</title>
-                <style>
-                    body { font-family: Arial; padding: 40px; background: #f5f5f5; }
-                    .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
-                    h1 { color: #2e7d32; }
-                    .endpoint { background: #f9f9f9; padding: 15px; margin: 10px 0; border-left: 4px solid #2e7d32; }
-                    code { background: #e0e0e0; padding: 2px 6px; border-radius: 3px; }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <h1>🌾 AgriPermit API</h1>
-                    <p>Agricultural Land Permit System - API Documentation</p>
-                    
-                    <h2>Available Endpoints:</h2>
-                    
-                    <div class="endpoint">
-                        <h3>GET /</h3>
-                        <p>API status and information</p>
-                        <code>curl http://localhost:8000/</code>
-                    </div>
-                    
-                    <div class="endpoint">
-                        <h3>GET /health</h3>
-                        <p>Health check endpoint</p>
-                        <code>curl http://localhost:8000/health</code>
-                    </div>
-                    
-                    <div class="endpoint">
-                        <h3>GET /api/v1/parcels</h3>
-                        <p>Get list of agricultural parcels</p>
-                        <code>curl http://localhost:8000/api/v1/parcels</code>
-                    </div>
-                    
-                    <h2>Status: ✅ Running</h2>
-                    <p>Server is operational and ready to accept requests.</p>
-                </div>
-            </body>
-            </html>
-            """
-            self.wfile.write(html.encode())
-        
-        else:
-            self.send_response(404)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            response = {"error": "Not found"}
-            self.wfile.write(json.dumps(response).encode())
-    
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-        self.end_headers()
-    
-    def log_message(self, format, *args):
-        print(f"[API] {args[0]}")
+# When running locally (start-local.bat), packages/ isn't on sys.path.
+# This insert makes `from rules import ...` work without setting PYTHONPATH manually.
+_packages = Path(__file__).parent.parent.parent / "packages"
+if _packages.exists() and str(_packages) not in sys.path:
+    sys.path.insert(0, str(_packages))
 
-if __name__ == '__main__':
-    server_address = ('', 8000)
-    httpd = HTTPServer(server_address, SimpleAPIHandler)
-    print('╔═══════════════════════════════════════╗')
-    print('║   🌾 AgriPermit API Server          ║')
-    print('║                                      ║')
-    print('║   Running on: http://localhost:8000  ║')
-    print('║   Docs: http://localhost:8000/docs   ║')
-    print('║                                      ║')
-    print('║   Press Ctrl+C to stop               ║')
-    print('╚═══════════════════════════════════════╝')
-    print()
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from apscheduler.schedulers.background import BackgroundScheduler
+
+from database import Base, engine
+from routers import permits, parcels, gis, users, stats, designs, orgs
+
+
+def _refresh_gis_cache():
+    """Background job: re-fetch GIS data for any cached parcel older than TTL."""
     try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        print('\nShutting down server...')
-        httpd.shutdown()
+        from rules.gis_client import refresh_stale_cache
+        refresh_stale_cache()
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning("GIS cache refresh job failed: %s", exc)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as exc:
+        print(f"[warning] Could not create DB tables: {exc}")
+
+    # Start background GIS cache refresh (every 6 hours)
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(_refresh_gis_cache, "interval", hours=6, id="gis_cache_refresh")
+    scheduler.start()
+
+    yield
+
+    scheduler.shutdown(wait=False)
+
+
+app = FastAPI(
+    title="AgriPermit API",
+    description="Agricultural Land Permit System",
+    version="1.0.0",
+    lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(permits.router)
+app.include_router(parcels.router)
+app.include_router(gis.router)
+app.include_router(users.router)
+app.include_router(stats.router)
+app.include_router(designs.router)
+app.include_router(orgs.router)
+
+
+@app.get("/", tags=["meta"])
+def root():
+    return {"message": "AgriPermit API", "status": "running", "version": "1.0.0"}
+
+
+@app.get("/health", tags=["meta"])
+def health():
+    return {"status": "healthy"}
