@@ -138,8 +138,9 @@ def _submission_to_response(s: DesignSubmission) -> DesignSubmissionResponse:
 )
 async def upload_design(
     file:      UploadFile = File(..., description="PDF, DXF, or DWG design file"),
-    parcel_id: Optional[str] = Form(None, description="Parcel ID to validate against"),
-    permit_id: Optional[str] = Form(None, description="Existing permit to attach this design to"),
+    gush:      Optional[int]   = Form(None, description="Israeli cadastral block number (גוש) to validate against"),
+    helka:     Optional[int]   = Form(None, description="Israeli cadastral plot number (חלקה) — optional, narrows the parcel search"),
+    permit_id: Optional[str]   = Form(None, description="Existing permit to attach this design to"),
     # Manual overrides — used when auto-extraction fails or needs correction
     floors_override:    Optional[int]   = Form(None, description="Override extracted floor count"),
     coverage_override:  Optional[float] = Form(None, description="Override extracted coverage %"),
@@ -154,12 +155,20 @@ async def upload_design(
     if len(data) > _MAX_FILE_MB * 1024 * 1024:
         raise HTTPException(413, f"File exceeds {_MAX_FILE_MB} MB limit")
 
-    # ── 2. Resolve parcel ─────────────────────────────────────────────────────
+    # ── 2. Resolve parcel by גוש / חלקה ──────────────────────────────────────
+    from sqlalchemy import select as sa_select
     parcel: Parcel | None = None
-    if parcel_id:
-        parcel = db.get(Parcel, parcel_id)
+    parcel_id: Optional[str] = None
+
+    if gush is not None:
+        q = sa_select(Parcel).where(Parcel.gush == gush)
+        if helka is not None:
+            q = q.where(Parcel.helka == helka)
+        parcel = db.scalars(q).first()
         if parcel is None:
-            raise HTTPException(404, f"Parcel '{parcel_id}' not found")
+            detail = f"גוש {gush}" + (f" חלקה {helka}" if helka is not None else "")
+            raise HTTPException(404, f"Parcel not found for {detail}")
+        parcel_id = parcel.id
 
     if permit_id:
         permit = db.get(Permit, permit_id)
@@ -208,7 +217,7 @@ async def upload_design(
             logger.warning("GIS check failed for design upload: %s", exc)
             params.warnings.append(f"GIS validation unavailable: {exc}")
     else:
-        params.warnings.append("No parcel selected — GIS validation skipped. Attach a parcel to get compliance results.")
+        params.warnings.append("No גוש entered — GIS validation skipped. Enter a block number (גוש) to get compliance results.")
 
     # ── 6. Persist ────────────────────────────────────────────────────────────
     submission = DesignSubmission(

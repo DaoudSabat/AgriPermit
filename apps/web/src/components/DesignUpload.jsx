@@ -10,7 +10,8 @@ export default function DesignUpload() {
   const fileRef        = useRef(null)
   const [file, setFile]               = useState(null)
   const [dragging, setDragging]       = useState(false)
-  const [parcelId, setParcelId]       = useState('')
+  const [gush, setGush]               = useState('')
+  const [helka, setHelka]             = useState('')
   const [floorsOverride, setFloors]   = useState('')
   const [coverageOverride, setCov]    = useState('')
   const [loading, setLoading]         = useState(false)
@@ -39,7 +40,8 @@ export default function DesignUpload() {
 
     const fd = new FormData()
     fd.append('file', file)
-    if (parcelId.trim()) fd.append('parcel_id', parcelId.trim())
+    if (gush.trim())  fd.append('gush', gush.trim())
+    if (helka.trim()) fd.append('helka', helka.trim())
     if (floorsOverride)  fd.append('floors_override', floorsOverride)
     if (coverageOverride) fd.append('coverage_override', coverageOverride)
 
@@ -57,7 +59,8 @@ export default function DesignUpload() {
     setFile(null)
     setResult(null)
     setError(null)
-    setParcelId('')
+    setGush('')
+    setHelka('')
     setFloors('')
     setCov('')
     if (fileRef.current) fileRef.current.value = ''
@@ -100,18 +103,29 @@ export default function DesignUpload() {
             )}
           </div>
 
-          {/* ── Parcel + optional overrides ─────────────── */}
+          {/* ── גוש / חלקה + optional overrides ────────── */}
           <div className="design-form__fields">
-            <div className="form-group">
-              <label>{t('design.parcelId')}</label>
-              <input
-                type="text"
-                value={parcelId}
-                onChange={e => setParcelId(e.target.value)}
-                placeholder={t('design.parcelIdPh')}
-              />
-              <small className="form-hint">{t('design.parcelIdHint')}</small>
+            <div className="design-form__row">
+              <div className="form-group">
+                <label>{t('design.gush')}</label>
+                <input
+                  type="number" min="1"
+                  value={gush}
+                  onChange={e => setGush(e.target.value)}
+                  placeholder={t('design.gushPh')}
+                />
+              </div>
+              <div className="form-group">
+                <label>{t('design.helka')}</label>
+                <input
+                  type="number" min="1"
+                  value={helka}
+                  onChange={e => setHelka(e.target.value)}
+                  placeholder={t('design.helkaPh')}
+                />
+              </div>
             </div>
+            <small className="form-hint">{t('design.gushHint')}</small>
 
             <div className="design-form__row">
               <div className="form-group">
